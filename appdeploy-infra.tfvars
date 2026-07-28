@@ -1,0 +1,7 @@
+k3s_version     = "v1.36.2+k3s1"
+server_name     = "appdeploy-node1"
+server_type     = "cpx32"
+server_image    = "ubuntu-26.04"
+server_location = "hel1"
+firewall_name   = "appdeploy-firewall"
+ssh_key_name    = "appdeploy-key"
