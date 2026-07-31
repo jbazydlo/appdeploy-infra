@@ -1,4 +1,4 @@
-.PHONY: clusterup clusterdown kubeconfig
+.PHONY: clusterup clusterdown kubeconfig argoup argotunnel
 
 clusterup:
 	terraform init
@@ -15,3 +15,13 @@ kubeconfig:
 	scp -i ~/.ssh/hetzner_key root@$$IP:/etc/rancher/k3s/k3s.yaml ./kubeconfig; \
 	sed -i "s/127.0.0.1/$$IP/g" ./kubeconfig; \
 	echo "Kubeconfig saved. Use: export KUBECONFIG=./kubeconfig"
+
+argoup:
+	@echo "Installing ArgoCD..."
+	@helm upgrade --install argocd argo/argo-cd --namespace argocd --create-namespace --version 10.2.1 --set server.service.type=LoadBalancer
+	@echo "Default password:"
+	@kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
+
+argotunnel:
+	@echo "Enabling ArgoCD tunnel..."
+	@kubectl port-forward service/argocd-server -n argocd 8088:443
