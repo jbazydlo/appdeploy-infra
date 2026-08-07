@@ -1,4 +1,4 @@
-.PHONY: clusterup clusterdown kubeconfig argoup argotunnel
+.PHONY: clusterup clusterdown kubeconfig argoup argotunnel deploypodinfo
 
 clusterup:
 	terraform init
@@ -20,8 +20,14 @@ argoup:
 	@echo "Installing ArgoCD..."
 	@helm upgrade --install argocd argo/argo-cd --namespace argocd --create-namespace --version 10.2.1 --set server.service.type=LoadBalancer
 	@echo "Default password:"
+	@sleep 20
 	@kubectl -n argocd get secret argocd-initial-admin-secret -o jsonpath="{.data.password}" | base64 -d
 
 argotunnel:
 	@echo "Enabling ArgoCD tunnel..."
 	@kubectl port-forward service/argocd-server -n argocd 8088:443
+
+deploypodinfo:
+	@echo "Installing podinfo appset..."
+	@kubectl apply -f ../appdeploy-gitops/argocd/appsets/podinfo.yaml
+
